@@ -74,6 +74,8 @@ class Persona{
 	
 	// ESTE PROXIMO METHOD ES BASTANTE FEO, YA SE, PERO NO SE ME OCURRIO COMO HACER PARA EVALUAR 
 	// UNA SITUACION HIPOTETICA SIN PRIMERO CAMBIARLA Y DESPUES VOLVERLA A LA NORMALIDAD :'(
+	// TODO tal vez se resuelve pensando en el disfraz como parametro 
+	// alguien.conformeCon(unDisfraz)
 	
 	method felicesCambiandoDisfraz(otroInvitado){
 		var queremosCambiar
@@ -95,6 +97,13 @@ class Persona{
 	
     // este proximo method tambien esta medio hecho un choclo, 
     // pero esta fue la solucion mas expresiva que pude hacer :/
+    // TODO se mejora delegando y abstrayendo. No recuerdo la letra chica de las validaciones, pero son las mismas para ambos
+    
+    // algo tipo :
+    // if self.puedeHacerElIntercambio() && invitado.puedeHacerElIntercambio()		
+    //   intercambiar
+    // else
+    //    excepcion	
     
 	method intercambiarDisfrazCon(invitado){
 		
@@ -167,7 +176,11 @@ object noAclara{
 
 // Creo que esto no es repetir logica, por mas que las lineas sean parecidas...
 // Es el mismo dilema que tuve con Crear/Eliminar o Agregar/Sacar en el parcial.
-
+// TODO: Es logica que se puede no repetir, siempre preguntas que el genero coincida. 
+// Ademas, se puede evitar la coparacion con strings, precisamente teniendo objetos que representan los generos. 
+// algo tipo
+// method puntosComodidad(persona) = 
+//		return if (persona.generoDisfraz() == self ) self.puntosMismoGenero() else self.puntosDistintoGenero()
 
 //                                           DISFRAZ:
 
@@ -196,6 +209,9 @@ object noEsDisfraz{
 		return false
 	}
 }
+//TODO: Para hacero así, que seguis haciendo un if esDisfraz(), alcanzaba con la variable en null. 
+// Si usas polimorfismo es para que el noDisfraz tenga comportamiento. Seria util en el caso que al no disfrazado le pasen cosas diferentes en la fiesta.
+// si es solo para validar el ingreso, no lo complicaría.
 
 
 //                                        CARACTERISTICAS:
