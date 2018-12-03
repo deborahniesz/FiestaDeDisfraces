@@ -29,14 +29,14 @@ object fiesta{
 		fecha = nuevaFecha
 	}
 	method invitarA(invitado){
-		if(invitado.disfraz().esDisfraz()) invitados.add(invitado)
+		if(invitado.tieneDisfraz()) invitados.add(invitado)
 		else throw noTieneDisfrazExc
 	}
 	method quitarA(invitado){
 		invitados.remove(invitado)
 	}
-	method confirmarInvitados(listaInvitados){
-		return listaInvitados.all({ invitado => invitados.contains(invitado)})
+	method asistio(unInvitado){
+		return invitados.contains(unInvitado)
 	}
 }
 
@@ -71,48 +71,37 @@ class Persona{
 	method disconforme(){
 		return !self.conformeConDisfraz()
 	}
-	
-	// ESTE PROXIMO METHOD ES BASTANTE FEO, YA SE, PERO NO SE ME OCURRIO COMO HACER PARA EVALUAR 
-	// UNA SITUACION HIPOTETICA SIN PRIMERO CAMBIARLA Y DESPUES VOLVERLA A LA NORMALIDAD :'(
-	
-	method felicesCambiandoDisfraz(otroInvitado){
-		var queremosCambiar
-		var disfrazAux = disfraz
-		
-		self.cambiarDisfraz(otroInvitado.disfraz())
-		otroInvitado.cambiarDisfraz(disfrazAux)
-		var conformeConDisfrazDeOtro = self.conformeConDisfraz()
-		var conformeOtroConMiDisfraz = otroInvitado.conformeConDisfraz()
-		if (conformeConDisfrazDeOtro && conformeOtroConMiDisfraz){
-			queremosCambiar = true
-		}else{
-			queremosCambiar = false
-		}
-		otroInvitado.cambiarDisfraz(self.disfraz())
-		self.cambiarDisfraz(disfrazAux)
-		return queremosCambiar
+	method generoDisfraz(){
+		return disfraz.genero()
+	}
+	method tieneDisfraz(){
+		return !(disfraz == null)
+	}
+	method conformeCon(unDisfraz){
+		var personaConOtroDisfraz = new Persona(disfraz =unDisfraz,edad=edad,idGenero=idGenero,exigencia = exigencia)
+		return personaConOtroDisfraz.conformeConDisfraz()
 	}
 	
-    // este proximo method tambien esta medio hecho un choclo, 
-    // pero esta fue la solucion mas expresiva que pude hacer :/
+	method felicesCambiandoDisfraz(otroInvitado){
+		return self.conformeCon(otroInvitado.disfraz())&& otroInvitado.conformeCon(disfraz)
+	}
+    
+    method puedenHacerCambio(invitado){
+    	var ambosAsistieron = fiesta.asistio(invitado) && fiesta.asistio(self) 
+		var algunoDisconforme = self.disconforme() || invitado.disconforme()
+		var quierenCambiarDisfraz = self.felicesCambiandoDisfraz(invitado)
+		return ambosAsistieron && algunoDisconforme && quierenCambiarDisfraz
+    }
     
 	method intercambiarDisfrazCon(invitado){
-		
-		var involucradosEnTrueque = [self,invitado]
-		var ambosAsistieron = fiesta.confirmarInvitados(involucradosEnTrueque)
-		var algunoDisconforme = involucradosEnTrueque.any({ involucrado => involucrado.disconforme() })
-		var quierenCambiarDisfraz = self.felicesCambiandoDisfraz(invitado)
-		
-		if(ambosAsistieron && algunoDisconforme && quierenCambiarDisfraz){
+		if(self.puedenHacerCambio(invitado)){
 			var disfrazAux = disfraz
 			
 			self.cambiarDisfraz(invitado.disfraz())
-		    invitado.cambiarDisfraz(disfrazAux)
-		    
+		    invitado.cambiarDisfraz(disfrazAux)	    
 		}else{
 			throw noSeRealizaCambioExc
 		}
-		
 	}
 }
 
@@ -144,59 +133,48 @@ class Numerologo inherits Persona{
 
 //                                        IDENTIDAD DE GENERO:
 
-object mujer{
+class Genero{
 	method puntosComodidad(persona){
-		if (persona.disfraz().genero() == "femenino") return 20
-		else return 0
+		if (persona.generoDisfraz() == self) return self.puntosMismoGenero() 
+		else return self.puntosDistintoGenero()
+	}
+	method puntosMismoGenero(){
+		return 20
+	}
+	method puntosDistintoGenero(){
+		return 0
 	}
 }
 
-object varon{
-	method puntosComodidad(persona){
-		if (persona.disfraz().genero() == "masculino") return 20
-		else return 0
-	}
-}
+object mujer inherits Genero{}
+
+object varon inherits Genero{}
+
+// podria poner aca los valores 20 y 0 y hacer genero clase abstracta, que priorizo?
 	
-object noAclara{
-	method puntosComodidad(persona){
-		if (persona.disfraz().genero() == "neutro") return 25
-		else return 20
+object noAclara inherits Genero{
+	override method puntosMismoGenero(){
+		return 25
+	}
+	override method puntosDistintoGenero(){
+		return 20
 	}
 }
-
-// Creo que esto no es repetir logica, por mas que las lineas sean parecidas...
-// Es el mismo dilema que tuve con Crear/Eliminar o Agregar/Sacar en el parcial.
-
 
 //                                           DISFRAZ:
 
 class Disfraz{
 	var property nombre = ""
 	var property fechaConfeccion //  new Date(dia,mes,anio)
-	var property caracteristicas // []
+	var property caracteristicas = #{}
 	var property gracia // de 1 a 10
-	var property genero = "femenino" // o "masculino" o "neutro"
+	var property genero = mujer // o varon o noAclara... o cualsea??
 	
 	method puntuacion(persona){
 		return caracteristicas.sum( { caracteristica => caracteristica.valor(persona) } )
 	}
-	method esDisfraz(){
-		return true
-	}
+
 }
-
-
-//well known object noEsDisfraz? que no tiene nada en especifico?
-// me hace mucho ruido esto, pero nunca voy a evaluar nada de "ningun disfraz"
-// ni el puntaje, ni nada relacionado a la fiesta porque el enunciado avisa que si
-// la persona no tiene disfraz no va a asistir a la fiesta... entonces lo dejo asi??
-object noEsDisfraz{
-	method esDisfraz(){
-		return false
-	}
-}
-
 
 //                                        CARACTERISTICAS:
 
@@ -222,4 +200,3 @@ class Careta{
 		return valorPersonaje
 	}
 }
-
