@@ -3,19 +3,19 @@ import fiestaDisfraces.*
 describe "Requerimientos"{
 	
 	var campesino = new Disfraz(nombre ="gauchito",fechaConfeccion = new Date(18,10,2018),
-		                          caracteristicas = [],gracia = 4, genero ="masculino")
+		                          caracteristicas = [],gracia = 4, genero =varon)
 	var fantasma = new Disfraz(nombre ="asistente de la Parca",fechaConfeccion = new Date(6,7,2018),
-		                          caracteristicas = [gracioso,tobara],gracia = 1, genero ="masculino")
+		                          caracteristicas = [gracioso,tobara],gracia = 1, genero =varon)
 	var cazaFantasma = new Disfraz(nombre="danny Phantom",fechaConfeccion= new Date(28,11,2018),
-		                           caracteristicas = [gracioso],gracia=10,genero="femenino")	
+		                           caracteristicas = [gracioso],gracia=10,genero=mujer)	
     var nacionFuego = new Disfraz(nombre="esto no es tribu del agua",fechaConfeccion = new Date(11,11,2018),
-    	                           caracteristicas =[gracioso], gracia=10,genero="neutro")
+    	                           caracteristicas =[gracioso], gracia=10,genero=noAclara)
                           
 	var helga = new Pretencioso(disfraz = campesino,edad = 15,idGenero=mujer,exigencia=20)
 	var arnold = new Numerologo(disfraz = fantasma,edad = 52,idGenero=varon,exigencia = 3)
 	var danny = new Persona(disfraz = cazaFantasma,edad=18,idGenero=noAclara,exigencia =10)
 	var katara = new Persona(disfraz = nacionFuego,edad=18,idGenero=mujer,exigencia =10)
-	var jakeLong = new Caprichoso(disfraz = noEsDisfraz,edad=17,idGenero=varon,exigencia =5)
+	var jakeLong = new Caprichoso(disfraz = null,edad=17,idGenero=varon,exigencia =5)
 	
 	fixture{
 		fiesta.invitarA(helga)
@@ -24,10 +24,9 @@ describe "Requerimientos"{
 		fiesta.invitarA(katara)
 	}
 	
-test "se confirma que ciertos invitados asistieron a la fiesta"{
-	  assert.that(fiesta.confirmarInvitados([arnold,helga]))
+test "saber si alguien asistio a fiesta" {
+	assert.that(fiesta.asistio(helga))
 }
-
 test "Determinar el puntaje de un disfraz" {
     assert.equals(30,danny.puntosPorDisfraz())
 }
